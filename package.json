@@ -1,0 +1,19 @@
+{
+  "name": "reservations",
+  "version": "1.0.0",
+  "description": "A reservations project using vanilla stuff",
+  "main": "server.js",
+  "scripts": {
+    "test": "node run dev",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "Reservations"
+  },
+  "author": "Tryferos",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
