@@ -5,6 +5,9 @@ import {UserSession, UserCredentials, UserQuery, UserQuerySingle} from './types/
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import mysql from 'mysql2';
+import dotenv from 'dotenv';
+
+dotenv.config({path: path.join(__dirname, '../.env.local')});
 
 const app = express()
 const port = 3000;
@@ -72,20 +75,20 @@ app.get('/', (req: UserSession, res) => {
 app.get('/logout', (req: UserSession, res) => {
     req.session.userid = null;
     req.session.destroy((err) => {
-        console.log('destory');
         res.redirect('/');
     });
 })
 
 const con = mysql.createConnection({
-    host: "localhost",
-    port: 3306,
-    user: 'root',
-    password: 'mysql_password_trifer_123_!',
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT as unknown as number,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
 });
 
 
 app.listen(port, () => {
+    console.log(process.env.DB_HOST);
     con.query(
         'CREATE TABLE IF NOT EXISTS mydb.users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255))', (res, err) => {
             console.log('Table created');

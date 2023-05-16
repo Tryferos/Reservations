@@ -19,6 +19,7 @@
     "@types/mysql": "^2.15.21",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
     "express": "^4.17.2",
     "express-session": "^1.17.3",
     "mysql": "^2.18.1",
