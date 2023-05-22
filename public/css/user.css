@@ -1,0 +1,48 @@
+#title{
+    text-align: center;
+    font-size: 2rem;
+}
+
+#stadiums-table{
+    font-family: Wotfard;
+    min-width:  100%;
+    border-collapse: collapse;
+    margin-top: 30px;
+}
+
+tr:nth-child(even){
+    background-color: var(--var-primary-extra-light);
+}
+
+.table-div{
+    overflow-x: auto;
+}
+
+th, td{
+    border-bottom: 1px solid var(--var-primary-light);
+    padding: 10px 20px;
+    text-align: center;
+    text-transform: capitalize;
+}
+
+
+th{
+    background-color: var(--var-secondary);
+    color: var(--var-secondary-font);
+    font-weight: 500;
+    font-size: 1.25rem;
+}
+
+
+tr[data-selected='true']{
+    background-color: var(--var-secondary-light);
+    color: var(--var-secondary-font);
+    cursor: pointer;
+}
+
+tr[data-selected='false']:hover{
+    filter: brightness(1.75);
+    cursor: pointer;
+}
+
+

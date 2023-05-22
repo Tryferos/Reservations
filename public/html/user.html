@@ -5,34 +5,27 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/user.css">
 </head>
-<script defer>
-    
-    function logout(){
-        const xhttp = new XMLHttpRequest();
-        xhttp.onload = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                console.log(this.responseText)
-            }   
-        }
-        xhttp.open('GET', 'http://127.0.0.1:3000/logout');
-        xhttp.setRequestHeader('Content-Type', 'application/json');
-        xhttp.send();
-    }
-
-</script>
+<script src="../scripts/user.js" defer></script>
 <body>
     <nav class="navbar">
-        <div>
-            <h2 id="username">Admin</h2>
+        <h2 id="username">Username</h2>
+        <div class="nav-btns">
+            <button id="" class="btn">Reservations</button>
             <form action="/logout" class="logout">
                 <button id="logout" class="btn">Logout</button>
             </form>
         </div>
     </nav>
-    <article>
-
-    </article>
+    <main>
+        <h2 id="title">Available Stadiums to reserve</h2>
+        <div class="table-div">
+            <table id="stadiums-table">
+            </table>
+        </div>
+    </main>
 </body>
 </html>

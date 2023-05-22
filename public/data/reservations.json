@@ -1,0 +1,75 @@
+{
+    "Stadiums": [
+        {
+            "id": 1,
+            "name": "5x5 Kautnatzoglio",
+            "type": "5x5",
+            "sport": "Football",
+            "date": 121341498,
+            "photo_url": "url",
+            "price_total": "60",
+            "reservable_at": {
+                "from": 9,
+                "to": 22
+            }
+        },
+        {
+            "id": 2,
+            "name": "5x5 Kautnatzoglio",
+            "type": "5x5",
+            "sport": "Football",
+            "date": 121341498,
+            "photo_url": "url",
+            "price_total": "60",
+            "reservable_at": {
+                "from": 9,
+                "to": 22
+            }
+        },
+        {
+            "id": 3,
+            "name": "5x5 Kautnatzoglio",
+            "type": "5x5",
+            "sport": "Football",
+            "date": 121341498,
+            "photo_url": "url",
+            "price_total": "60",
+            "reservable_at": {
+                "from": 9,
+                "to": 22
+            }
+        },
+        {
+            "id": 4,
+            "name": "5x5 Kautnatzoglio",
+            "type": "5x5",
+            "sport": "Football",
+            "date": 121341498,
+            "photo_url": "url",
+            "price_total": "60",
+            "reservable_at": {
+                "from": 9,
+                "to": 22
+            }
+        }
+    ],
+    "Reservations": [
+        {
+            "id": 1,
+            "stadium_id": 1,
+            "date": 1213451235,
+            "reserved_for": {
+                "from": 1214214,
+                "to": 1214220
+            },
+            "user_id": 22,
+            "payment": false
+        }
+    ],
+    "Users": [
+        {
+            "id": 22,
+            "username": "Tryferos"
+        }
+    ]
+}
