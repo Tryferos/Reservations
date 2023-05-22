@@ -56,23 +56,48 @@ async function populateData(){
             row.appendChild(cell);
         }
         row.setAttribute('data-selected', false)
-        applyRowListener(row)
+        applyRowListener(row, data[i])
         table.appendChild(row);
     }
 }
 
-function applyRowListener(row){
+function applyRowListener(row, data){
     row.addEventListener('click', ev => {
         const target = ev.currentTarget;
         let clicked = target.dataset.selected;
         if(clicked==="true"){
             target.setAttribute('data-selected', false);
+            hideStadium();
         }else{
             Array.from(document.getElementById("stadiums-table").rows).forEach(row => {
                 if(row.dataset.selected==false)return;
                 row.setAttribute('data-selected', false);
             })
+            showStadium(data)
             target.setAttribute('data-selected', true);
         }
     })
+}
+
+function hideStadium(){
+    const el = document.getElementById("selected-stadium");
+    el.setAttribute('data-show', 'false')
+}
+
+function showStadium(data){
+    const el = document.getElementById("selected-stadium");
+    el.setAttribute('data-show', 'true')
+    const img = document.getElementById("stadium-image");
+    img.src = data.photo_url;
+    const title = document.getElementById("stadium-title");
+    title.innerText = data.name;
+    const details = document.getElementById("stadium-details");
+    details.childNodes.forEach(item => details.removeChild(item))
+    const p1 = document.createElement("p");
+    p1.innerText = data.sport;
+    const p2 = document.createElement("p");
+    p2.innerText=data.type;
+    const p3 = document.createElement("p");
+    p3.innerText=data.price;
+    details.append(p1,p2,p3)
 }

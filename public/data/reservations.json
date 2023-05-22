@@ -6,7 +6,7 @@
             "type": "5x5",
             "sport": "Football",
             "date": 121341498,
-            "photo_url": "url",
+            "photo_url": "../images/paok-stadium.jpg",
             "price_total": "60",
             "reservable_at": {
                 "from": 9,
@@ -15,8 +15,8 @@
         },
         {
             "id": 2,
-            "name": "5x5 Kautnatzoglio",
-            "type": "5x5",
+            "name": "10x10 Kautnatzoglio",
+            "type": "10x10",
             "sport": "Football",
             "date": 121341498,
             "photo_url": "url",
@@ -33,7 +33,7 @@
             "sport": "Football",
             "date": 121341498,
             "photo_url": "url",
-            "price_total": "60",
+            "price_total": "90",
             "reservable_at": {
                 "from": 9,
                 "to": 22
@@ -43,7 +43,7 @@
             "id": 4,
             "name": "5x5 Kautnatzoglio",
             "type": "5x5",
-            "sport": "Football",
+            "sport": "Tennis",
             "date": 121341498,
             "photo_url": "url",
             "price_total": "60",
