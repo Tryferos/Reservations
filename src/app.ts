@@ -1,12 +1,12 @@
 import express from 'express'
 import path from 'path';
 import session from 'express-session';
-import {UserSession, UserCredentials, UserQuery, UserQuerySingle, StadiumQuery} from './types/user'
+import {UserSession, UserCredentials, UserQuery, UserQuerySingle, StadiumQuery, MySQLInsert} from './types/user'
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
-import {insertUser, retrieveUser, verifyUser} from './db/queries'
+import {insertUser, retrieveUser, retrieveUserById, verifyUser} from './db/queries'
 
 dotenv.config({path: path.join(__dirname, '../.env.local')});
 
@@ -48,9 +48,9 @@ app.post('/login', (req: UserSession, res) => {
                 res.redirect('/?error=wrong_password');
                 return;
             }
-            insertUser(con, username, password, (err, result: UserQuerySingle) => {
+            insertUser(con, username, password, (err, result) => {
                 if(err) throw err;
-                req.session.userid = result.id;
+                req.session.userid = `${result.insertId}`;
                 res.redirect('/');   
             });
        });
@@ -73,6 +73,13 @@ app.get('/stadiums', (req: UserSession, res) => {
     });
 
 });
+
+app.get('/username', (req: UserSession, res) => {
+    verifyUser(req, res, () => retrieveUserById(con, req.session.userid, (err, result: UserQuery) => {
+        if(err || result.length==0) throw err;
+        res.json(result.at(0));
+    }));
+})
 
 
 app.get('/', (req: UserSession, res) => {
@@ -102,7 +109,7 @@ const con = mysql.createConnection({
 
 
 app.listen(port, () => {
-    console.log(process.env.DB_HOST);
+    console.log("runing in: "+`http://localhost:${port}`);
     con.query(
         'CREATE TABLE IF NOT EXISTS mydb.users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255))', (res, err) => {
         }

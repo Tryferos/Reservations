@@ -24,8 +24,27 @@ async function fetchReservations(){
     })
 }
 
+async function fetchUsername(){
+    return new Promise((res, rej) => {
+        const xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function(){
+            if(this.readyState==4 && this.status==200){
+                res(JSON.parse(this.responseText).username)
+            }
+        }
+        xhttp.open("GET", `http://${location.hostname+":"+location.port}/username`, true);
+        xhttp.send();
+    });
+}
+
+async function getUsername(){
+    const username = document.getElementById("username");
+    username.innerText = await fetchUsername();
+}
+
 window.addEventListener('load', (ev) => {
     const success = populateData();
+    getUsername();
 })
 
 async function populateData(){

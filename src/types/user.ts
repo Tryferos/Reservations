@@ -24,7 +24,8 @@ export type UserSession = Omit<express.Request, 'body'> &
 {body: Pick<UserCredentials, 'password' | 'username'>} &
 {session: session.Session & Partial<session.SessionData> & {userid: string}};
 
-type MySQLType = (mysql.RowDataPacket[] | mysql.RowDataPacket[][] | mysql.OkPacket | mysql.OkPacket[] | mysql.ResultSetHeader);
+export type MySQLType = (mysql.RowDataPacket[] | mysql.RowDataPacket[][] | mysql.OkPacket | mysql.OkPacket[] | mysql.ResultSetHeader);
+export type MySQLInsert = mysql.ResultSetHeader;
 
 export type UserQuery = MySQLType & Array<UserCredentials>;
 export type UserQuerySingle = MySQLType & UserCredentials;
