@@ -18,6 +18,13 @@ tr:nth-child(even){
     visibility: hidden;
 }
 
+#zero-entries{
+    text-align: center;
+    margin-top: 25px;
+    font-size: 1.25rem;
+    color: var(--var-secondary);
+}
+
 #selected-stadium{
     margin-top: 75px;
     width: 100%;

@@ -15,10 +15,11 @@ async function fetchReservations(){
         const xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function(){
         if(this.readyState==4 && this.status==200){
-            res(JSON.parse(this.responseText).Stadiums)
+            res(JSON.parse(this.responseText))
         }
     }
-        xhttp.open("GET", "http://127.0.0.1:8080/data/reservations.json", true);
+    console.log(location.hostname+location.port);
+        xhttp.open("GET", `http://${location.hostname+":"+location.port}/stadiums`, true);
         xhttp.send();
     })
 }
@@ -34,6 +35,12 @@ async function populateData(){
     
     const data = await fetchReservations();
 
+    if(data.length==0) {
+        const p = document.getElementById("zero-entries");
+        p.innerText = "No stadiums found."
+        return;
+    }
+
     const keys = Object.keys(data.at(0));
 
     for(let i=0;i<keys.length;i++){
@@ -48,8 +55,6 @@ async function populateData(){
         for(let j=0;j<keys.length;j++){
             const cell = document.createElement("td");
             const cellText = document.createTextNode(
-                keys[j]=="reservable_at" ? 
-                data[i][keys[j]]["from"]+"-"+data[i][keys[j]]["to"]: 
                 data[i][keys[j]]
             );
             cell.appendChild(cellText);
@@ -98,6 +103,6 @@ function showStadium(data){
     const p2 = document.createElement("p");
     p2.innerText=data.type;
     const p3 = document.createElement("p");
-    p3.innerText=data.price;
+    p3.innerText=data.price_total+"EUR";
     details.append(p1,p2,p3)
 }
