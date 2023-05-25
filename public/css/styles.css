@@ -8,7 +8,7 @@
     color: var(--var-primary)
 }
 
-form fieldset{
+.login fieldset{
     border: none;
     padding: rem;
     display: flex;
@@ -17,7 +17,7 @@ form fieldset{
     width: 100%;
 }
 
-form{
+.login{
     width: clamp(250px, 50%, 500px);
 }
 
@@ -25,25 +25,37 @@ body > article{
     margin-top: 75px;
 }
 
-form fieldset div{
+.login fieldset div{
     border: none;
     padding: 0rem;
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
-form fieldset div input{
+.login fieldset div input{
     padding: 14px 18px;
     border-radius: 4px;
     outline: 1px solid #ccc;
     border: none;
 }
-form fieldset div input:focus{
+.login fieldset div input:focus{
     border: none;
     outline: 1px solid #868383;
 }
-form fieldset div label{
+.login fieldset div label{
     font-size: 0.7em;
+}
+
+.btn-sec{
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    padding: 10px 16px;
+    color: var(--var-primary);
+}
+
+.btn-sec:hover{
+    text-decoration: underline;
 }
 
 .navbar{
@@ -67,7 +79,7 @@ form fieldset div label{
 }
 
 
-.signin button{
+.signin .login button{
     padding: 14px 18px;
     border-radius: 4px;
     outline: 1px solid #ccc;
@@ -79,7 +91,7 @@ form fieldset div label{
     cursor: pointer;
 }
 
-.signin button:hover{
+.signin .login button:hover{
     background-color: var(--var-secondary);
     opacity: 0.8;
 }

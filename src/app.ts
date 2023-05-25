@@ -1,12 +1,12 @@
 import express from 'express'
 import path from 'path';
 import session from 'express-session';
-import {UserSession, UserCredentials, UserQuery, UserQuerySingle, StadiumQuery, MySQLInsert} from './types/user'
+import {UserSession, UserCredentials, UserQuery, UserQuerySingle, StadiumQuery, MySQLInsert, UserType} from './types/user'
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
-import {insertUser, retrieveUser, retrieveUserById, verifyUser} from './db/queries'
+import {insertUser, retrieveUser, retrieveUserFieldById, verifyUser} from './db/queries'
 
 dotenv.config({path: path.join(__dirname, '../.env.local')});
 
@@ -30,11 +30,16 @@ app.use(cookieParser());
 
 
 const index = path.join(__dirname, '../public/html/index.html')
+const merchant = path.join(__dirname, '../public/html/merchant.html')
 const user = path.join(__dirname, '../public/html/user.html')
 
 app.post('/login', (req: UserSession, res) => {
-    const {username, password} = req.body;
-    retrieveUser(con, username, password, (err, result: UserQuery) => {
+    const {username, password, normal, merchant} = req.body;
+    if(!normal && !merchant){
+        res.redirect('/?error=invalid_login_method');
+    }
+    const type = merchant ? UserType.Merchant : UserType.Normal;
+    retrieveUser(con, username, password, type, (err, result: UserQuery) => {
         if(err) throw err;
        if(result.length > 0){
            req.session.userid = result[0].id;
@@ -42,26 +47,32 @@ app.post('/login', (req: UserSession, res) => {
            return;
         }
         
-        con.query(`select * from mydb.users where username = '${username}'`, (err, result: UserQuery) => {
+        con.query(`select * from mydb.users where username = '${username}' and type = '${type}'`, (err, result: UserQuery) => {
             if(err) throw err;
             if(result.length > 0){
                 res.redirect('/?error=wrong_password');
                 return;
             }
-            insertUser(con, username, password, (err, result) => {
+            insertUser(con, username, password, type, (err, result) => {
                 if(err) throw err;
                 req.session.userid = `${result.insertId}`;
                 res.redirect('/');   
             });
        });
     });
-})
+});
 
-app.get('/create', (req, res) => {
+app.get('/user-type', (req: UserSession, res) => {
     const sezzion = req.session;
-    console.log(sezzion);
-    res.sendFile(index);
-})
+    if(sezzion.userid){
+        retrieveUserFieldById(con, sezzion.userid, "type",(err, result: UserQuery) => {
+            if(err) throw err;
+            res.json(result[0].type);
+        });
+    }else{
+        res.json(null);
+    }
+});
 
 app.get('/stadiums', (req: UserSession, res) => {
 
@@ -75,9 +86,9 @@ app.get('/stadiums', (req: UserSession, res) => {
 });
 
 app.get('/username', (req: UserSession, res) => {
-    verifyUser(req, res, () => retrieveUserById(con, req.session.userid, (err, result: UserQuery) => {
+    verifyUser(req, res, () => retrieveUserFieldById(con, req.session.userid, "username",(err, result: UserQuery) => {
         if(err || result.length==0) throw err;
-        res.json(result.at(0));
+        res.json(result[0].username);
     }));
 })
 
@@ -89,6 +100,17 @@ app.get('/', (req: UserSession, res) => {
         return;
     }else{
         res.sendFile(index);
+        return;
+    }
+})
+
+app.get('/merchant', (req: UserSession, res) => {
+    const sezzion = req.session;
+    if(sezzion.userid){
+        res.sendFile(user);
+        return;
+    }else{
+        res.sendFile(merchant);
         return;
     }
 })
@@ -111,7 +133,7 @@ const con = mysql.createConnection({
 app.listen(port, () => {
     console.log("runing in: "+`http://localhost:${port}`);
     con.query(
-        'CREATE TABLE IF NOT EXISTS mydb.users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255))', (res, err) => {
+        'CREATE TABLE IF NOT EXISTS mydb.users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), type ENUM("Normal", "Merchant", "Admin"))', (res, err) => {
         }
     )
     con.query(

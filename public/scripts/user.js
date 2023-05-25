@@ -10,41 +10,63 @@ function logout(){
     xhttp.send();
 }
 
-async function fetchReservations(){
-    return new Promise((res, rej) => {
-        const xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function(){
-        if(this.readyState==4 && this.status==200){
-            res(JSON.parse(this.responseText))
-        }
-    }
-    console.log(location.hostname+location.port);
-        xhttp.open("GET", `http://${location.hostname+":"+location.port}/stadiums`, true);
-        xhttp.send();
-    })
-}
-
-async function fetchUsername(){
+async function fetchFromServer(path){
     return new Promise((res, rej) => {
         const xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function(){
             if(this.readyState==4 && this.status==200){
-                res(JSON.parse(this.responseText).username)
+                res(JSON.parse(this.responseText))
             }
         }
-        xhttp.open("GET", `http://${location.hostname+":"+location.port}/username`, true);
+        xhttp.open("GET", `http://${location.hostname+":"+location.port}/${path}`, true);
         xhttp.send();
     });
 }
+
+async function fetchStadiums(){
+    return (await fetchFromServer("stadiums"));
+}
+
+async function fetchUsername(){
+    return (await fetchFromServer("username"));
+}
+
+async function fetchUserType(){
+    return (await fetchFromServer("user-type"));
+}
+
 
 async function getUsername(){
     const username = document.getElementById("username");
     username.innerText = await fetchUsername();
 }
 
+const UserTypes = ["Merchant", "Admin", "User"];
+
+async function getUserType(){
+
+    const type = await fetchUserType();
+    if(type==UserTypes[0]){
+        applyMerchantPaylod();
+    }
+}
+
+async function applyMerchantPaylod(){
+    const btns = document.getElementById("nav-btns");
+    const form = document.createElement("form");
+    form.setAttribute('action', '/create-stadium');
+    const btn = document.createElement("button");
+    btn.setAttribute('type', 'submit');
+    btn.setAttribute('class', 'btn');
+    form.appendChild(btn);
+    btn.innerText = "Create a Stadium";
+    btns.insertBefore(form, btns.children[0]);
+}
+
 window.addEventListener('load', (ev) => {
     const success = populateData();
     getUsername();
+    getUserType();
 })
 
 async function populateData(){
@@ -52,7 +74,7 @@ async function populateData(){
     const table = document.getElementById("stadiums-table");
     if(table==null || table==undefined) return false;
     
-    const data = await fetchReservations();
+    const data = await fetchStadiums();
 
     if(data.length==0) {
         const p = document.getElementById("zero-entries");

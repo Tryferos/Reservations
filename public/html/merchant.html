@@ -8,13 +8,12 @@
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/styles.css">
 </head>
-
 <body>
     <nav class="navbar"></nav>
     <article class="signin">
         <header>
-            <h1>Your details</h1>
-            <h2>Please provide your username and password.</h2>
+            <h1>Merchant Mode</h1>
+            <h2>Publish your stadiums for reservation and start earning today!</h2>
         </header>
         <form action="/login" method="post" class="login">
             <fieldset>
@@ -32,12 +31,9 @@
                     pattern=".*{8,20}]"
                     placeholder="Enter your password">
                 </div>
-                <input type="checkbox" name="normal" value="true" checked hidden>
+                <input type="checkbox" value="true" name="merchant" checked hidden>
                 <button>Sign In</button>
             </fieldset>
-        </form>
-        <form action="/merchant" method="get">
-            <button class="btn-sec">Are you a merchant?</button>
         </form>
     </article>
 </body>
