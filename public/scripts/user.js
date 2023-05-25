@@ -54,7 +54,8 @@ async function getUserType(){
 async function applyMerchantPaylod(){
     const btns = document.getElementById("nav-btns");
     const form = document.createElement("form");
-    form.setAttribute('action', '/create-stadium');
+    form.setAttribute('action', '/stadium-creation');
+    form.setAttribute('method', 'POST');
     const btn = document.createElement("button");
     btn.setAttribute('type', 'submit');
     btn.setAttribute('class', 'btn');

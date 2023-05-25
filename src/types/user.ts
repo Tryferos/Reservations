@@ -23,17 +23,6 @@ export type UserCredentialsQuery = {
     type: UserType;
 }
 
-export type Stadium = {
-    id: number;
-    name: string;
-    type: string;
-    sport: string;
-    date: number;
-    photo_url: string;
-    price_total: number;
-    available_from: number;
-    available_to: number;
-}
 
 export type UserSession = Omit<express.Request, 'body'> & 
 {body: Pick<UserCredentials, 'password' | 'username' | 'normal' | 'merchant'>} &
@@ -44,6 +33,3 @@ export type MySQLInsert = mysql.ResultSetHeader;
 
 export type UserQuery = MySQLType & Array<UserCredentialsQuery>;
 export type UserQuerySingle = MySQLType & UserCredentialsQuery;
-
-export type StadiumQuery = MySQLType & Array<Stadium>;
-export type StadiumQuerySingle = MySQLType & Stadium;

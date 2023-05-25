@@ -1,7 +1,8 @@
 import express from 'express'
 import path from 'path';
 import session from 'express-session';
-import {UserSession, UserCredentials, UserQuery, UserQuerySingle, StadiumQuery, MySQLInsert, UserType} from './types/user'
+import {UserSession, UserCredentials, UserQuery, UserQuerySingle,  MySQLInsert, UserType} from './types/user'
+import {StadiumQuery} from './types/stadium';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import mysql from 'mysql2';
@@ -31,6 +32,7 @@ app.use(cookieParser());
 
 const index = path.join(__dirname, '../public/html/index.html')
 const merchant = path.join(__dirname, '../public/html/merchant.html')
+const stadiumCreation = path.join(__dirname, '../public/html/stadium-creation.html')
 const user = path.join(__dirname, '../public/html/user.html')
 
 app.post('/login', (req: UserSession, res) => {
@@ -81,6 +83,24 @@ app.get('/stadiums', (req: UserSession, res) => {
             if(err) throw err;
             res.json(result);
         });
+    });
+
+});
+app.post('/create-stadium', (req: UserSession, res) => {
+
+    verifyUser(req, res, () => {
+        // if(!req.body.name || !req.body.type || !req.body.sport || !req.body.date || !req.body.price_total || !req.body.available_from || !req.body.available_to){
+        //     res.redirect('/stadium-creation?error=missing_fields');
+        //     return;
+        // }
+        // const {name, type, sport, date, price_total, available_from, available_to} = req.body;
+    });
+
+});
+app.post('/stadium-creation', (req: UserSession, res) => {
+
+    verifyUser(req, res, () => {
+        res.sendFile(stadiumCreation);
     });
 
 });

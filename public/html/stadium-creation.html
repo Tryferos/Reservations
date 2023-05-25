@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/user.css">
+    <link rel="stylesheet" href="../css/stadium.css">
+</head>
+<script src="../scripts/user.js" defer></script>
+<script src="../scripts/stadium.js"></script>
+
+<body>
+    <nav class="navbar">
+        <h2 id="username">Username</h2>
+        <div class="nav-btns" id="nav-btns">
+            <form action="/reservations">
+                <button id="" class="btn">Reservations</button>
+            </form>
+            <form action="/logout" class="logout">
+                <button id="logout" class="btn">Logout</button>
+            </form>
+        </div>
+    </nav>
+    <main>
+        <form action="/create-stadium" method="POST" class="std-form">
+            <fieldset>
+                <div>
+                    <label for="name">Stadium Title<span aria-required="true">*</span></label>
+                    <input type="text" name="name" id="name" class="normal-input" required pattern="[a-zA-Z0-9]{4,20}"
+                        placeholder="Enter Stadium's Title">
+                </div>
+                <div>
+                    <label for="location">Stadium Location<span aria-required="true">*</span></label>
+                    <input type="text" name="location" id="location" class="normal-input" required
+                        pattern="[a-zA-Z0-9]{4,20}" placeholder="Enter Stadium's Location">
+                </div>
+                <div>
+                    <label for="type">Stadium Capacity Type<span aria-required="true">*</span></label>
+                    <div class="capacity">
+                        <input value="5" onchange="onCapacityChange(this)" min="1" max="11" type="number" name="type"
+                            id="capacity" class="normal-input" />
+                        <h2>X</h2>
+                        <input value="5" type="number" name="type" id="capacity-sec" class="normal-input" readonly />
+                    </div>
+                </div>
+                <div>
+                    <label for="sport">Sport Type<span aria-required="true">*</span></label>
+                    <select name="sport" id="sport" class="normal-input dropdown">
+                        <option value="Football">Football</option>
+                        <option value="Basketball">Basketball</option>
+                        <option value="Volleyball">Volleyball</option>
+                        <option value="Tennis">Tennis</option>
+                        <option value="Handball">Handball</option>
+                        <option value="Golf">Golf</option>
+                        <option value="Table Tennis">Table Tennis</option>
+                        <option value="Bowling">Bowling</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="available_from">Stadium Availability<span aria-required="true">*</span></label>
+                    <div class="capacity">
+                        <h2>From</h2>
+                        <input value="9" min="0" max="24" type="number" name="available_from" id="available_from"
+                            class="normal-input" />
+                        <h2>To: </h2>
+                        <input value="18" min="0" max="24" type="number" name="available_to" id="available_to"
+                            class="normal-input" />
+                    </div>
+                </div>
+                <div id="price">
+                    <label for="price_total">Stadium Price<span aria-required="true">*</span></label>
+                    <div class="capacity">
+                        <input min="0" step="0.1" type="number" name="price_total" 
+                        id="price_total" class="normal-input"
+                            required placeholder="Price">
+                        <h2>EUR | &euro;</h2>
+                    </div>
+                </div>
+                <div>
+                    <label for="description">Stadium Description<span aria-required="true"></span></label>
+                    <textarea name="description" id="description" class="normal-input" required
+                        placeholder="Enter Stadium's Description"></textarea>
+                </div>
+                <div>
+                    <label for="image">Stadium Image<span aria-required="false"></span></label>
+                    <input onchange="onImageSelect(this)" type="file" name="image" id="image" class="normal-input" required
+                        placeholder="Enter Stadium's Image" accept="image/png, image/jpg, image/jpeg">
+                </div>
+                <div>
+                    <label for="game_length">Game Length<span aria-required="false">*</span></label>
+                    <div class="capacity">
+                        <input value="60" step="5" min="0" max="120" type="number" name="game_length" id="game_length"
+                            class="normal-input" />
+                        <h2>Minutes</h2>
+                    </div>
+                </div>  
+            </fieldset>
+            <img id="stadium-image"/>
+            <button class="btn">Create Stadium</button>
+        </form>
+    </main>
+</body>
+
+</html>

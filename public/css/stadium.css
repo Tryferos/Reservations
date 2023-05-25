@@ -1,0 +1,105 @@
+.std-form{
+    width: 100%;
+    height: 80vh;
+    padding: 25px clamp(10px, 5%, 150px);
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+}
+
+fieldset label{
+    font-size: 2.25rem;
+}
+
+.capacity{
+    display: flex;
+    width: 100%;
+    gap: 0px 12px;
+    align-items: center;
+}
+
+.capacity > input {
+    width: 30%;
+}
+
+.capacity > h2{
+    font-weight: 400;
+    color: #868383;
+}
+
+fieldset{
+    border:none;
+    row-gap: 10px;
+    display: grid;
+    grid-template-columns: 1.5fr 1.5fr 1fr;
+    gap: 20px 40px;
+    width: calc(100%-2vw);
+}
+
+.std-form fieldset > div{
+    border: none;
+    padding: 0rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.std-form fieldset div .normal-input{
+    padding: 14px 18px;
+    border-radius: 4px;
+    outline: 1px solid #ccc;
+    font-size: 1.15rem;
+    border: none;
+}
+.std-form fieldset div .normal-input:focus{
+    border: none;
+    outline: 1px solid #868383;
+}
+.std-form fieldset div label{
+    font-size: 0.7em;
+}
+
+.dropdown{
+    margin: 0;      
+    -webkit-appearance: none;
+    cursor: pointer;
+    -webkit-border-radius: 0px;
+    -moz-appearance: none;
+    appearance: none;
+    background: url('../images/arrow-down.png') no-repeat 97% 50% #ffffff;
+    background-size: 32px 27px;
+}
+
+option{
+    border:none;
+    outline: none;
+    font-size: 1.05rem;
+}
+
+#description{
+    max-height: 200px;
+    max-width: 600px;
+    padding: 14px 18px;
+    border-radius: 4px;
+    outline: 1px solid #ccc;
+    font-size: 1.15rem;
+    border: none;
+    min-width: 100%;
+    min-height: 60px;
+    height: 54px;
+}
+
+#description:focus{
+    border: none;
+    outline: 1px solid #868383;
+}
+
+#stadium-image{
+    width: 50%;
+    height: 40%;
+    object-fit: contain;
+    border: 0;
+    outline: none;
+    display: none;
+}
