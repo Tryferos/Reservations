@@ -70,6 +70,7 @@ window.addEventListener('load', (ev) => {
     getUserType();
 })
 
+const euros = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' });
 async function populateData(){
 
     const table = document.getElementById("stadiums-table");
@@ -93,13 +94,19 @@ async function populateData(){
         table.appendChild(th);
     }
 
+
     for(let i =0; i< data.length;i++){
         const row = document.createElement("tr");
         for(let j=0;j<keys.length;j++){
             if(keys[j]=="image" || keys[j]=="id") continue;
             const cell = document.createElement("td");
             const cellText = document.createTextNode(
-                data[i][keys[j]]
+                keys[j]!='price_total' ? keys[j]!='game_length' ?  
+                keys[j].includes('available') ? `${`${data[i][keys[j]]}`.length==1 ? `0${data[i][keys[j]]}` : data[i][keys[j]]}:00` 
+                : data[i][keys[j]] : 
+                `${data[i][keys[j]]} minutes`
+                :
+                euros.format(data[i][keys[j]])
             );
             cell.appendChild(cellText);
             row.appendChild(cell);
@@ -142,12 +149,16 @@ function showStadium(data){
     const title = document.getElementById("stadium-title");
     title.innerText = data.name;
     const details = document.getElementById("stadium-details");
-    details.childNodes.forEach(item => details.removeChild(item))
+    while(details.hasChildNodes()){
+        details.removeChild(details.firstChild)
+    }
     const p1 = document.createElement("p");
     p1.innerText = data.sport;
     const p2 = document.createElement("p");
     p2.innerText=data.type;
     const p3 = document.createElement("p");
-    p3.innerText=data.price_total+"EUR";
-    details.append(p1,p2,p3)
+    p3.innerText=euros.format(data.price_total);
+    const p4 = document.createElement("p");
+    p4.innerText=data.game_length+" Minutes";
+    details.append(p1,p2,p3,p4)
 }
