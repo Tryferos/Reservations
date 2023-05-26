@@ -1,7 +1,7 @@
 import express from 'express'
 import session from 'express-session'
 import mysql from 'mysql2'
-import { StadiumBody } from './stadium';
+import { ReservationBody, StadiumBody } from './stadium';
 
 export type UserCredentials = {
     id: string;
@@ -26,7 +26,7 @@ export type UserCredentialsQuery = {
 
 
 export type UserSession = Omit<express.Request, 'body'> & 
-{body: Pick<UserCredentials, 'password' | 'username' | 'normal' | 'merchant'> | StadiumBody} &
+{body: Pick<UserCredentials, 'password' | 'username' | 'normal' | 'merchant'> | StadiumBody | ReservationBody} &
 {session: session.Session & Partial<session.SessionData> & {userid: string}};
 
 export type MySQLType = (mysql.RowDataPacket[] | mysql.RowDataPacket[][] | mysql.OkPacket | mysql.OkPacket[] | mysql.ResultSetHeader);

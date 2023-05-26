@@ -23,6 +23,20 @@ async function fetchFromServer(path){
     });
 }
 
+async function postToServer(path, data){
+    return new Promise((res, rej) => {
+        const xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function(){
+            if(this.readyState==4 && this.status==200){
+                res(JSON.parse(this.status))
+            }
+        }
+        xhttp.open("POST", `http://${location.hostname+":"+location.port}/${path}`, true);
+        xhttp.setRequestHeader('Content-Type', 'application/json');
+        xhttp.send(JSON.stringify(data));
+    });
+}
+
 async function fetchStadiums(){
     return (await fetchFromServer("stadiums"));
 }
@@ -39,6 +53,10 @@ async function fetchUserType(){
 async function getUsername(){
     const username = document.getElementById("username");
     username.innerText = await fetchUsername();
+}
+
+async function getReservations(stadium_id){
+    return (await fetchFromServer(`reservations/${stadium_id}`));
 }
 
 const UserTypes = ["Merchant", "Admin", "User"];
@@ -97,6 +115,7 @@ async function populateData(){
         li.appendChild(img);
         li.appendChild(p);
         li.setAttribute('data-selected', false);
+        li.setAttribute('data-stadium_id', stadium.id);
         applyItemListener(li, stadium, list, hideStadium, showStadium);
         list.appendChild(li);
     })
@@ -110,8 +129,9 @@ function applyItemListener(row, data, parent, hide, show){
             target.setAttribute('data-selected', false);
             hide();
         }else{
+            if(row.dataset.reserved=="true") return;
             Array.from(parent.children).forEach(row => {
-                if(row.dataset.selected==false)return;
+                if(row.dataset.selected=="false")return;
                 row.setAttribute('data-selected', false);
             })
             show(data)
@@ -126,7 +146,7 @@ function hideStadium(){
 }
 
 
-function showStadium(data){
+async function showStadium(data){
     const el = document.getElementById("selected-stadium");
     el.setAttribute('data-show', 'true')
     const details = document.getElementById("stadium-details");
@@ -149,6 +169,7 @@ function showStadium(data){
     while(schedule.hasChildNodes()){
         schedule.removeChild(schedule.firstChild)
     }
+    const reservations = await getReservations(data.id);
     const times = ((parseInt(data.available_to) - parseInt(data.available_from))*60)/(parseInt(data.game_length));
     for(let i=0; i<times; i++){
         const li = document.createElement("li");
@@ -159,9 +180,31 @@ function showStadium(data){
         to = formatTime(`${to}`);
         p.innerText = `${from} - ${to}`;
         li.appendChild(p);
+        li.setAttribute('data-time_slot', i);
+        if(reservations.some(item => item.time_slot==i)){
+            li.setAttribute('data-reserved', true);
+        }else{
+            li.setAttribute('data-reserved', false);
+        }
         applyItemListener(li, data, schedule, ()=>{}, ()=>{});
         schedule.appendChild(li);
     }
+}
+
+function reserveTimeSlot(){
+    const stadium = document.querySelector("#stadium-list [data-selected='true']");
+    const stadium_id= stadium.dataset.stadium_id;
+    const item = document.querySelector("[data-selected='true'][data-reserved='false']")
+    if(item==null || item==undefined) return;
+    const time_slot = item.dataset.time_slot;
+    const data = {stadium_id, time_slot};
+    postToServer('reservation', data).then(
+        status => {
+            if(status==200){
+                item.setAttribute('data-reserved', true);
+            }
+        }
+    )
 }
 
 function formatTime(arg){

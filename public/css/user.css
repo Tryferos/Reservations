@@ -27,9 +27,19 @@
 #stadium-list > li > img{
     width: calc(64px + 2.5vw);
     height: calc(64px + 2.5vw);
-    object-fit: contain;
+    object-fit: cover;
     border: 1px solid var(--var-primary-light);
     border-radius: 50%;
+}
+
+#schedule > li[data-reserved='true']{
+    outline: 1px solid var(--var-primary-light);
+    cursor: not-allowed;
+}
+
+#schedule > li[data-reserved='false']{
+    outline: 1px solid var(--var-primary);
+    cursor: pointer;
 }
 
 
@@ -46,7 +56,6 @@
     justify-content: center;
     align-items: center;
     padding: 5px 5px;
-    outline: 1px solid var(--var-primary);
     border-radius: 4px;
 }
 
@@ -57,8 +66,8 @@
     gap: 12px 0px;
 }
 
-#schedule > li[data-selected='true'],
-#schedule > li:hover{
+#schedule > li[data-selected='true'][data-reserved='false'],
+#schedule > li[data-reserved='false']:hover{
     outline: 2px solid var(--var-secondary);
     transform: scale(1.03);
     cursor: pointer;
@@ -125,11 +134,11 @@ li[data-selected]{
 }
 
 
-li[data-selected='true'] > p{
+#stadium-list > li[data-selected='true'] > p{
     color: var(--var-secondary);
 }
 
-li[data-selected='false']:hover > p{
+#stadium-list > li[data-selected='false']:hover > p{
     color: var(--var-secondary)
 }
 

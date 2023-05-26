@@ -2,13 +2,13 @@ import express from 'express'
 import path from 'path';
 import session from 'express-session';
 import {UserSession, UserCredentials, UserQuery, UserQuerySingle,  MySQLInsert, UserType} from './types/user'
-import {StadiumBody, StadiumQuery} from './types/stadium';
+import {ReservationBody, StadiumBody, StadiumQuery} from './types/stadium';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import multer from 'multer';
-import {insertStadium, insertUser, retrieveStadiums, retrieveUser, retrieveUserFieldById, verifyUser} from './db/queries'
+import {insertStadium, insertStadiumReservation, insertUser, retrieveStadiumReservations, retrieveStadiums, retrieveUser, retrieveUserFieldById, verifyUser} from './db/queries'
 
 dotenv.config({path: path.join(__dirname, '../.env.local')});
 
@@ -78,6 +78,27 @@ app.get('/user-type', (req: UserSession, res) => {
         res.json(null);
     }
 });
+
+app.post('/reservation', (req: UserSession, res) => {
+    const body = req.body as ReservationBody;
+    verifyUser(req, res, () => {
+        insertStadiumReservation(con, body, req.session.userid,(err, result: MySQLInsert) => {
+            if(err) throw err;
+            res.status(200).json(result.insertId);
+        });
+    });
+});
+
+app.get('/reservations/:stadium_id', (req: UserSession, res) => {
+    const stadium_id = req.params.stadium_id as unknown as number;
+    verifyUser(req, res, () => {
+        retrieveStadiumReservations(con, stadium_id, (err, result) => {
+            if(err) throw err;
+            res.json(result);
+        });
+    });
+});
+
 
 app.get('/stadiums', (req: UserSession, res) => {
 
@@ -183,8 +204,13 @@ app.listen(port, () => {
         }
     )
     con.query(
-        'CREATE TABLE IF NOT EXISTS mydb.stadiums (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), type VARCHAR(255), sport VARCHAR(255), date BIGINT(255), photo_url VARCHAR(255)'+
+        'CREATE TABLE IF NOT EXISTS mydb.stadiums (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), type VARCHAR(255), sport VARCHAR(255), date BIGINT(255), image VARCHAR(255), description VARCHAR(255), location VARCHAR(255), owner_id INT FOREIGN KEY references mydb.users(id)'+
             ', price_total FLOAT(255,2), available_from TINYINT(255), available_to TINYINT(255))', (res, err) => {
+        }
+    )
+    con.query(
+        'CREATE TABLE IF NOT EXISTS mydb.reservations (id INT AUTO_INCREMENT PRIMARY KEY,'+
+            'stadium_id int, user_id int, time_slot int, date bigint(255), FOREIGN KEY (stadium_id) references mydb.stadiums(id), FOREIGN KEY (user_id) references mydb.users(id))', (res, err) => {
         }
     )
     return console.log('Express is listening in '+port);

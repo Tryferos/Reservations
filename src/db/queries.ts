@@ -1,7 +1,7 @@
 import mysql from 'mysql2';
 import {UserSession, UserCredentials, UserQuery, UserQuerySingle, MySQLType, MySQLInsert, UserType} from '../types/user'
 import { UserCredentialsQuery } from '../types/user';
-import { StadiumBody, StadiumQuery } from '../types/stadium'
+import { ReservationBody, StadiumBody, StadiumQuery } from '../types/stadium'
 
 export function retrieveUser(
     db: mysql.Connection,
@@ -53,8 +53,31 @@ export function retrieveStadiums(
     db: mysql.Connection,
     callback: (err: mysql.QueryError | null, res: StadiumQuery) => void
     ) {
-        db.query('select s.name, s.type, s.sport, s.date, s.price_total, s.available_from, s.available_to, s.location, s.game_length, s.image, s.description from mydb.stadiums s', callback);
+        db.query('select s.name, s.type, s.sport, s.date, s.price_total, s.available_from, s.available_to, s.location, s.game_length, s.image, s.description, s.id from mydb.stadiums s', callback);
 }
+
+export function retrieveStadiumReservations(
+    db: mysql.Connection,
+    stadium_id: number,
+    callback: (err: mysql.QueryError | null, res: MySQLType) => void
+    ) {
+        db.query(`select r.date, r.time_slot, r.id, r.stadium_id from mydb.reservations r where r.stadium_id = ${stadium_id}`, callback);
+}
+
+export function insertStadiumReservation(
+    db: mysql.Connection,
+    body: ReservationBody,
+    user_id: number | string,
+    callback: (err: mysql.QueryError | null, res: MySQLInsert) => void
+    ) {
+        const date = new Date().getTime();
+        db.query(`insert into mydb.reservations (stadium_id, user_id, date, time_slot) select ${body.stadium_id}, ${user_id}, ${date}, ${body.time_slot} 
+        where not exists (select stadium_id, user_id, time_slot from mydb.reservations 
+            where stadium_id=${body.stadium_id} and time_slot=${body.time_slot} and user_id=${user_id}
+        )`, callback);
+}
+
+
 
 
 
