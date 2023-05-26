@@ -8,7 +8,7 @@ import cors from 'cors';
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import multer from 'multer';
-import {insertStadium, insertUser, retrieveUser, retrieveUserFieldById, verifyUser} from './db/queries'
+import {insertStadium, insertUser, retrieveStadiums, retrieveUser, retrieveUserFieldById, verifyUser} from './db/queries'
 
 dotenv.config({path: path.join(__dirname, '../.env.local')});
 
@@ -82,7 +82,7 @@ app.get('/user-type', (req: UserSession, res) => {
 app.get('/stadiums', (req: UserSession, res) => {
 
     verifyUser(req, res, () => {
-        con.query('select * from mydb.stadiums', (err, result: StadiumQuery) => { 
+        retrieveStadiums(con, (err, result: StadiumQuery) => {
             if(err) throw err;
             res.json(result);
         });

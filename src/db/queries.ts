@@ -1,7 +1,7 @@
 import mysql from 'mysql2';
 import {UserSession, UserCredentials, UserQuery, UserQuerySingle, MySQLType, MySQLInsert, UserType} from '../types/user'
 import { UserCredentialsQuery } from '../types/user';
-import { StadiumBody } from '../types/stadium'
+import { StadiumBody, StadiumQuery } from '../types/stadium'
 
 export function retrieveUser(
     db: mysql.Connection,
@@ -47,6 +47,13 @@ export function insertStadium(
         db.query(
             `insert into mydb.stadiums (name, type, sport, date, image, price_total, available_from, available_to, location, description, owner_id, game_length) values ('${data.name}', '${data.type}', '${data.sport}', '${date}', '${data.image}', '${data.price_total}', '${data.available_from}', '${data.available_to}', '${data.location}', '${data.description}', '${owner_id}', '${data.game_length}')`,
         callback);
+}
+
+export function retrieveStadiums(
+    db: mysql.Connection,
+    callback: (err: mysql.QueryError | null, res: StadiumQuery) => void
+    ) {
+        db.query('select s.name, s.type, s.sport, s.date, s.price_total, s.available_from, s.available_to, s.location, s.game_length, s.image, s.description from mydb.stadiums s', callback);
 }
 
 

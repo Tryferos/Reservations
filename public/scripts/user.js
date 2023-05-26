@@ -86,8 +86,9 @@ async function populateData(){
     const keys = Object.keys(data.at(0));
 
     for(let i=0;i<keys.length;i++){
+        if(keys[i]=="image" || keys[i]=="id") continue;
         const th = document.createElement("th");
-        const thText = document.createTextNode(keys[i].replaceAll("_", ' ').replaceAll("url", ""));
+        const thText = document.createTextNode(keys[i].replaceAll("_", ' '));
         th.appendChild(thText);
         table.appendChild(th);
     }
@@ -95,6 +96,7 @@ async function populateData(){
     for(let i =0; i< data.length;i++){
         const row = document.createElement("tr");
         for(let j=0;j<keys.length;j++){
+            if(keys[j]=="image" || keys[j]=="id") continue;
             const cell = document.createElement("td");
             const cellText = document.createTextNode(
                 data[i][keys[j]]
@@ -131,17 +133,6 @@ function hideStadium(){
     el.setAttribute('data-show', 'false')
 }
 
-function dataURLToBlob(dataurl) {
-    let arr = dataurl.split(',');
-    let mime = arr[0].match(/:(.*?);/)[1];
-    let bstr = atob(arr[1]);
-    let n = bstr.length;
-    let u8arr = new Uint8Array(n);
-    while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new Blob([u8arr], { type: mime });
-}
 
 function showStadium(data){
     const el = document.getElementById("selected-stadium");
