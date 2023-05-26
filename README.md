@@ -1,4 +1,4 @@
 # Reservations
-A reservations web application.
+A stadium reservation web application.
 Client-Side: Vanilla Javascript/CSS/HTML.
 Server-Side: Nodejs with Typescript, Express, MySQL.
