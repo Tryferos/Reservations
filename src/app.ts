@@ -2,12 +2,13 @@ import express from 'express'
 import path from 'path';
 import session from 'express-session';
 import {UserSession, UserCredentials, UserQuery, UserQuerySingle,  MySQLInsert, UserType} from './types/user'
-import {StadiumQuery} from './types/stadium';
+import {StadiumBody, StadiumQuery} from './types/stadium';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
-import {insertUser, retrieveUser, retrieveUserFieldById, verifyUser} from './db/queries'
+import multer from 'multer';
+import {insertStadium, insertUser, retrieveUser, retrieveUserFieldById, verifyUser} from './db/queries'
 
 dotenv.config({path: path.join(__dirname, '../.env.local')});
 
@@ -15,6 +16,7 @@ const app = express()
 const port = 3000;
 
 app.use(express.static('public'));
+app.use('/stadiums', express.static('stadiums'));
 app.use(cors());
 app.use(session({
     secret: 'apotinathinathapigenwstinpatra',
@@ -25,18 +27,19 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
 }));
-app.use(express.json());
+app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
+app.use(express.urlencoded({limit: '50mb', extended: true}));
 
-
+const imagesDirectory = 'stadiums/'
 const index = path.join(__dirname, '../public/html/index.html')
 const merchant = path.join(__dirname, '../public/html/merchant.html')
 const stadiumCreation = path.join(__dirname, '../public/html/stadium-creation.html')
 const user = path.join(__dirname, '../public/html/user.html')
 
 app.post('/login', (req: UserSession, res) => {
-    const {username, password, normal, merchant} = req.body;
+    const {username, password, normal, merchant} = req.body as UserCredentials;
     if(!normal && !merchant){
         res.redirect('/?error=invalid_login_method');
     }
@@ -86,14 +89,37 @@ app.get('/stadiums', (req: UserSession, res) => {
     });
 
 });
-app.post('/create-stadium', (req: UserSession, res) => {
 
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, imagesDirectory)
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.fieldname + '-' + file.originalname)
+    }
+  })
+  
+  const upload = multer({ storage: storage })
+app.post('/create-stadium', upload.single('image'),(req: UserSession, res, next) => {
+
+    const body = req.body as StadiumBody;
+    body.type = (body.type as unknown as string[]).join('x');
+    const file = req.file;
     verifyUser(req, res, () => {
-        // if(!req.body.name || !req.body.type || !req.body.sport || !req.body.date || !req.body.price_total || !req.body.available_from || !req.body.available_to){
-        //     res.redirect('/stadium-creation?error=missing_fields');
-        //     return;
-        // }
-        // const {name, type, sport, date, price_total, available_from, available_to} = req.body;
+        if(!body.name || !body.type || !body.location || !body.price_total || !body.available_to || !body.available_from || !body.game_length || !body.sport){
+            res.redirect('/stadium-creation?error=missing_fields');
+            return;
+        }
+        if(file!=undefined){
+            body.image = imagesDirectory+ file.fieldname + '-' + file.originalname;
+        }
+        insertStadium(con, req.session.userid as unknown as number, body, (err, result) => {
+            if(err) throw err;
+            res.writeHead(302, {
+                'Location': '/'
+            });
+            res.end();
+        });
     });
 
 });

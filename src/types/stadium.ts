@@ -6,7 +6,7 @@ export type StadiumQuerySQL = {
     type: string;
     sport: string;
     date: number;
-    photo_url: string;
+    image: string;
     price_total: number;
     available_from: number;
     available_to: number;
@@ -15,6 +15,7 @@ export type StadiumQuerySQL = {
     owner_id: number;
     game_length: number;
 }
+export type StadiumBody = Omit<StadiumQuerySQL, 'id' | 'owner_id'>;
 export type Stadium = Omit<StadiumQuerySQL, 'owner_id'>;
 
 export type StadiumQuery = MySQLType & Array<Stadium>;

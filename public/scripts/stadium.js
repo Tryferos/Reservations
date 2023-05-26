@@ -16,3 +16,15 @@ function onImageSelect(target){
 }
 
 
+function getImageData(){
+    const img = document.getElementById("stadium-image");
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+    const data = canvas.toDataURL("image/png");
+    return data;
+}
+
+

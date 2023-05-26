@@ -131,11 +131,23 @@ function hideStadium(){
     el.setAttribute('data-show', 'false')
 }
 
+function dataURLToBlob(dataurl) {
+    let arr = dataurl.split(',');
+    let mime = arr[0].match(/:(.*?);/)[1];
+    let bstr = atob(arr[1]);
+    let n = bstr.length;
+    let u8arr = new Uint8Array(n);
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+}
+
 function showStadium(data){
     const el = document.getElementById("selected-stadium");
     el.setAttribute('data-show', 'true')
     const img = document.getElementById("stadium-image");
-    img.src = data.photo_url;
+    img.src = data.image;
     const title = document.getElementById("stadium-title");
     title.innerText = data.name;
     const details = document.getElementById("stadium-details");

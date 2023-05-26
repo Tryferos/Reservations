@@ -14,6 +14,7 @@
 <script src="../scripts/user.js" defer></script>
 <script src="../scripts/stadium.js"></script>
 
+
 <body>
     <nav class="navbar">
         <h2 id="username">Username</h2>
@@ -27,17 +28,18 @@
         </div>
     </nav>
     <main>
-        <form action="/create-stadium" method="POST" class="std-form">
+        <form id="stadium-form" action="/create-stadium" 
+        method="post" enctype="multipart/form-data" class="std-form">
             <fieldset>
                 <div>
                     <label for="name">Stadium Title<span aria-required="true">*</span></label>
-                    <input type="text" name="name" id="name" class="normal-input" required pattern="[a-zA-Z0-9]{4,20}"
+                    <input type="text" name="name" id="name" class="normal-input" required pattern=".*{4,32}"
                         placeholder="Enter Stadium's Title">
                 </div>
                 <div>
                     <label for="location">Stadium Location<span aria-required="true">*</span></label>
                     <input type="text" name="location" id="location" class="normal-input" required
-                        pattern="[a-zA-Z0-9]{4,20}" placeholder="Enter Stadium's Location">
+                        pattern=".*{4,40}" placeholder="Enter Stadium's Location">
                 </div>
                 <div>
                     <label for="type">Stadium Capacity Type<span aria-required="true">*</span></label>
@@ -50,7 +52,7 @@
                 </div>
                 <div>
                     <label for="sport">Sport Type<span aria-required="true">*</span></label>
-                    <select name="sport" id="sport" class="normal-input dropdown">
+                    <select name="sport" id="sport" value="Football" class="normal-input dropdown">
                         <option value="Football">Football</option>
                         <option value="Basketball">Basketball</option>
                         <option value="Volleyball">Volleyball</option>
@@ -83,12 +85,12 @@
                 </div>
                 <div>
                     <label for="description">Stadium Description<span aria-required="true"></span></label>
-                    <textarea name="description" id="description" class="normal-input" required
+                    <textarea name="description" id="description" class="normal-input"
                         placeholder="Enter Stadium's Description"></textarea>
                 </div>
                 <div>
                     <label for="image">Stadium Image<span aria-required="false"></span></label>
-                    <input onchange="onImageSelect(this)" type="file" name="image" id="image" class="normal-input" required
+                    <input onchange="onImageSelect(this)" type="file" name="image" id="image" class="normal-input"
                         placeholder="Enter Stadium's Image" accept="image/png, image/jpg, image/jpeg">
                 </div>
                 <div>
@@ -100,7 +102,7 @@
                     </div>
                 </div>  
             </fieldset>
-            <img id="stadium-image"/>
+            <img name="image" id="stadium-image"/>
             <button class="btn">Create Stadium</button>
         </form>
     </main>
