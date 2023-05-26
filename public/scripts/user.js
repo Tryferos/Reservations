@@ -73,8 +73,8 @@ window.addEventListener('load', (ev) => {
 const euros = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' });
 async function populateData(){
 
-    const table = document.getElementById("stadiums-table");
-    if(table==null || table==undefined) return false;
+    const list = document.getElementById("stadium-list");
+    if(list==null || list==undefined) return false;
     
     const data = await fetchStadiums();
 
@@ -84,52 +84,37 @@ async function populateData(){
         return;
     }
 
+    const title = document.getElementById("title");
+    title.append(" ("+data.length+")")
+
     const keys = Object.keys(data.at(0));
-
-    for(let i=0;i<keys.length;i++){
-        if(keys[i]=="image" || keys[i]=="id") continue;
-        const th = document.createElement("th");
-        const thText = document.createTextNode(keys[i].replaceAll("_", ' '));
-        th.appendChild(thText);
-        table.appendChild(th);
-    }
-
-
-    for(let i =0; i< data.length;i++){
-        const row = document.createElement("tr");
-        for(let j=0;j<keys.length;j++){
-            if(keys[j]=="image" || keys[j]=="id") continue;
-            const cell = document.createElement("td");
-            const cellText = document.createTextNode(
-                keys[j]!='price_total' ? keys[j]!='game_length' ?  
-                keys[j].includes('available') ? `${`${data[i][keys[j]]}`.length==1 ? `0${data[i][keys[j]]}` : data[i][keys[j]]}:00` 
-                : data[i][keys[j]] : 
-                `${data[i][keys[j]]} minutes`
-                :
-                euros.format(data[i][keys[j]])
-            );
-            cell.appendChild(cellText);
-            row.appendChild(cell);
-        }
-        row.setAttribute('data-selected', false)
-        applyRowListener(row, data[i])
-        table.appendChild(row);
-    }
+    data.forEach((stadium, i) => {
+        const li = document.createElement("li");
+        const img = document.createElement("img");
+        img.src = stadium.image;
+        const p = document.createElement("p");
+        p.innerText = stadium.name;
+        li.appendChild(img);
+        li.appendChild(p);
+        li.setAttribute('data-selected', false);
+        applyItemListener(li, stadium, list, hideStadium, showStadium);
+        list.appendChild(li);
+    })
 }
 
-function applyRowListener(row, data){
+function applyItemListener(row, data, parent, hide, show){
     row.addEventListener('click', ev => {
         const target = ev.currentTarget;
         let clicked = target.dataset.selected;
         if(clicked==="true"){
             target.setAttribute('data-selected', false);
-            hideStadium();
+            hide();
         }else{
-            Array.from(document.getElementById("stadiums-table").rows).forEach(row => {
+            Array.from(parent.children).forEach(row => {
                 if(row.dataset.selected==false)return;
                 row.setAttribute('data-selected', false);
             })
-            showStadium(data)
+            show(data)
             target.setAttribute('data-selected', true);
         }
     })
@@ -144,10 +129,6 @@ function hideStadium(){
 function showStadium(data){
     const el = document.getElementById("selected-stadium");
     el.setAttribute('data-show', 'true')
-    const img = document.getElementById("stadium-image");
-    img.src = data.image;
-    const title = document.getElementById("stadium-title");
-    title.innerText = data.name;
     const details = document.getElementById("stadium-details");
     while(details.hasChildNodes()){
         details.removeChild(details.firstChild)
@@ -161,4 +142,37 @@ function showStadium(data){
     const p4 = document.createElement("p");
     p4.innerText=data.game_length+" Minutes";
     details.append(p1,p2,p3,p4)
+    
+    const title = document.getElementById("stadium-title");
+    title.innerText = data.name+", "+data.location;
+    const schedule = document.getElementById("schedule");
+    while(schedule.hasChildNodes()){
+        schedule.removeChild(schedule.firstChild)
+    }
+    const times = ((parseInt(data.available_to) - parseInt(data.available_from))*60)/(parseInt(data.game_length));
+    for(let i=0; i<times; i++){
+        const li = document.createElement("li");
+        const p = document.createElement("p");
+        let from = `${data.available_from+((i*data.game_length)/60)}`;
+        from = formatTime(from);
+        let to = i==times-1 ? data.available_to : data.available_from+(((i+1)*data.game_length)/60);
+        to = formatTime(`${to}`);
+        p.innerText = `${from} - ${to}`;
+        li.appendChild(p);
+        applyItemListener(li, data, schedule, ()=>{}, ()=>{});
+        schedule.appendChild(li);
+    }
+}
+
+function formatTime(arg){
+    let time = arg;
+    const timeArr = time.split(".");
+    if(timeArr[1]==undefined){
+        timeArr[0].length==1 ? time = "0"+timeArr[0]+":00" :time = timeArr[0]+":00";
+    }else{
+        let minutes = (parseInt(timeArr[1])*0.6)*10;
+        minutes = minutes.toString().length==1 ? "0"+minutes : minutes;
+        timeArr[0].length==1 ? time= "0"+timeArr[0]+":"+minutes :time = timeArr[0]+":"+minutes;
+    }
+    return time;
 }

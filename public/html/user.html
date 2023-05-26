@@ -25,22 +25,24 @@
     <main>
         <h2 id="title">Available Stadiums to reserve</h2>
         <p id="zero-entries"></p>
-        <div class="table-div">
-            <table id="stadiums-table">
-            </table>
-        </div>
+        <ul class="table-div" id="stadium-list">
+            
+        </ul>
         <div id="selected-stadium" data-show="false">
-            <figure>
-                <img id="stadium-image"/>
-                <figcaption id="stadium-title"></figcaption> 
-            </figure>
-            <div class="details">
-                <details open="true">
-                    <summary>Stadium Information</summary>
-                    <div id="stadium-details">
-                    </div>
-                </details>
-                <input type="button" class="btn" value="Reserve"/>
+            <h2 id="stadium-title"></h2>
+            <div>
+                <div class="details">
+                    <details open="true">
+                        <summary>Stadium Information</summary>
+                        <div id="stadium-details">
+                        </div>
+                    </details>
+                    <input type="button" class="btn" value="Reserve"/>
+                </div>
+                <div id="availability">
+                    <h2>Stadium Availability</h2>
+                    <ul id="schedule"></ul>
+                </div>
             </div>
         </div>
     </main>
