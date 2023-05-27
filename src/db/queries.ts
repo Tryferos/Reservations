@@ -62,7 +62,9 @@ export function retrieveStadiumReservations(
     day: Weekday,
     callback: (err: mysql.QueryError | null, res: MySQLType) => void
     ) {
-        db.query(`select r.date, r.time_slot, r.id, r.stadium_id from mydb.reservations r where r.stadium_id = ${stadium_id} and r.day = '${day}'`, callback);
+        const date = new Date();
+        const end = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0,0,0);
+        db.query(`select r.date, r.time_slot, r.id, r.stadium_id, r.day from mydb.reservations r where r.stadium_id = ${stadium_id} and r.day = '${day}' and r.date_day > ${end.getTime()}`, callback);
 }
 
 export function insertStadiumReservation(
@@ -71,10 +73,18 @@ export function insertStadiumReservation(
     user_id: number | string,
     callback: (err: mysql.QueryError | null, res: MySQLInsert) => void
     ) {
-        const date = new Date().getTime();
-        db.query(`insert into mydb.reservations (stadium_id, user_id, date, time_slot, day) select ${body.stadium_id}, ${user_id}, ${date}, ${body.time_slot}, ${body.day} 
-        where not exists (select stadium_id, time_slot, day from mydb.reservations 
-            where stadium_id=${body.stadium_id} and time_slot=${body.time_slot} and day='${body.day}'
+        const date = new Date(); //6 -> 4, 4 -> 6, 2 -> 3
+        const end = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
+        let offset = 0;
+        if(date.getDay()>body.day){
+            offset = (6-date.getDay())+body.day+1;
+        }else{
+            offset = body.day-date.getDay();
+        }
+        const date_day = end.getTime() + (86400*1000*(offset));
+        db.query(`insert into mydb.reservations (stadium_id, user_id, date, time_slot, day, date_day) select ${body.stadium_id}, ${user_id}, ${date.getTime()}, ${body.time_slot}, '${body.day}', ${date_day}  
+        where not exists (select stadium_id, time_slot, day, date_day from mydb.reservations 
+            where stadium_id=${body.stadium_id} and time_slot=${body.time_slot} and day='${body.day}' and date_day > ${date.getTime()}
         )`, callback);
 }
 

@@ -206,7 +206,8 @@ function reserveTimeSlot(){
     if(time_slot_item ==null || time_slot_item ==undefined) return;
     if(day_item ==null || day_item ==undefined) return;
     const time_slot = time_slot_item.dataset.time_slot;
-    const day = (parseInt(day_item.dataset.day)-(new Date().getDate()))%7;
+    const date = new Date();
+    const day = (parseInt(day_item.dataset.day)-(date.getDate())+date.getDay())%7;
     const data = {stadium_id, time_slot, day};
     postToServer('reservation', data).then(
         status => {
@@ -237,23 +238,23 @@ function showDates(data){
     }
 
     const date = new Date();
-    let day = date.getDate();
-    let month = date.getMonth()+1;
+    let currentDay = date.getDate();
+    let currentMonth = date.getMonth()+1;
 
     let hasSetAvailableDay = false;
 
     for(let i=0; i<7; i++){
         const li = document.createElement("li")
-        li.setAttribute('data-day', `${day+i}`);
+        li.setAttribute('data-day', `${currentDay+i}`);
         li.setAttribute('id', 'date-item');
-        const weekday = (getDayOfTheWeek()+i)%6;
+        const weekday = (getDayOfTheWeek()+i)%7;
         const isAvailable = data.available_days.some(item => item==weekday);
         li.setAttribute('data-selected', isAvailable && !hasSetAvailableDay ? 'true' : 'false');
         if(isAvailable) hasSetAvailableDay = true;
         const p =document.createElement("p");
         const newDate = new Date(date.getTime()+(i*24*60*60*1000));
-        day = newDate.getDate();
-        month = newDate.getMonth()+1;
+        const day = newDate.getDate();
+        const month = newDate.getMonth()+1;
         p.innerText = `${day}/${month}`;
         li.appendChild(p);
         li.setAttribute('data-closed', !isAvailable);

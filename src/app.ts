@@ -212,7 +212,7 @@ app.listen(port, () => {
     )
     con.query(
         'CREATE TABLE IF NOT EXISTS mydb.reservations (id INT AUTO_INCREMENT PRIMARY KEY,'+
-            'stadium_id int, user_id int, time_slot int, date bigint(255), FOREIGN KEY (stadium_id) references mydb.stadiums(id), FOREIGN KEY (user_id) references mydb.users(id))', (res, err) => {
+            'stadium_id int, user_id int, time_slot int, date bigint(255), date_day bigint(255),FOREIGN KEY (stadium_id) references mydb.stadiums(id), FOREIGN KEY (user_id) references mydb.users(id))', (res, err) => {
         }
     )
 })
