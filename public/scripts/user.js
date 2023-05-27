@@ -55,8 +55,8 @@ async function getUsername(){
     username.innerText = await fetchUsername();
 }
 
-async function getReservations(stadium_id){
-    return (await fetchFromServer(`reservations/${stadium_id}`));
+async function getReservations(stadium_id, day){
+    return (await fetchFromServer(`reservations/${stadium_id}/${day}`));
 }
 
 const UserTypes = ["Merchant", "Admin", "User"];
@@ -116,12 +116,12 @@ async function populateData(){
         li.appendChild(p);
         li.setAttribute('data-selected', false);
         li.setAttribute('data-stadium_id', stadium.id);
-        applyItemListener(li, stadium, list, hideStadium, showStadium);
+        applyItemListener(li, list, hideStadium, showStadium, stadium);
         list.appendChild(li);
     })
 }
 
-function applyItemListener(row, data, parent, hide, show){
+function applyItemListener(row, parent, hide, show, ...data){
     row.addEventListener('click', ev => {
         const target = ev.currentTarget;
         let clicked = target.dataset.selected;
@@ -134,7 +134,7 @@ function applyItemListener(row, data, parent, hide, show){
                 if(row.dataset.selected=="false")return;
                 row.setAttribute('data-selected', false);
             })
-            show(data)
+            show(...data)
             target.setAttribute('data-selected', true);
         }
     })
@@ -165,18 +165,25 @@ async function showStadium(data){
     
     const title = document.getElementById("stadium-title");
     title.innerText = data.name+", "+data.location;
+
+    showDates(data);
+    await showAvailableReservations(data, getDayOfTheWeek());
+}
+
+async function showAvailableReservations(...data){
+    const [stadium, day] = data;
     const schedule = document.getElementById("schedule");
     while(schedule.hasChildNodes()){
         schedule.removeChild(schedule.firstChild)
     }
-    const reservations = await getReservations(data.id);
-    const times = ((parseInt(data.available_to) - parseInt(data.available_from))*60)/(parseInt(data.game_length));
+    const reservations = await getReservations(stadium.id, day);
+    const times = ((parseInt(stadium.available_to) - parseInt(stadium.available_from))*60)/(parseInt(stadium.game_length));
     for(let i=0; i<times; i++){
         const li = document.createElement("li");
         const p = document.createElement("p");
-        let from = `${data.available_from+((i*data.game_length)/60)}`;
+        let from = `${stadium.available_from+((i*stadium.game_length)/60)}`;
         from = formatTime(from);
-        let to = i==times-1 ? data.available_to : data.available_from+(((i+1)*data.game_length)/60);
+        let to = i==times-1 ? stadium.available_to : stadium.available_from+(((i+1)*stadium.game_length)/60);
         to = formatTime(`${to}`);
         p.innerText = `${from} - ${to}`;
         li.appendChild(p);
@@ -186,7 +193,7 @@ async function showStadium(data){
         }else{
             li.setAttribute('data-reserved', false);
         }
-        applyItemListener(li, data, schedule, ()=>{}, ()=>{});
+        applyItemListener(li, schedule, ()=>{}, ()=>{}, stadium);
         schedule.appendChild(li);
     }
 }
@@ -194,14 +201,17 @@ async function showStadium(data){
 function reserveTimeSlot(){
     const stadium = document.querySelector("#stadium-list [data-selected='true']");
     const stadium_id= stadium.dataset.stadium_id;
-    const item = document.querySelector("[data-selected='true'][data-reserved='false']")
-    if(item==null || item==undefined) return;
-    const time_slot = item.dataset.time_slot;
-    const data = {stadium_id, time_slot};
+    const time_slot_item = document.querySelector("[data-selected='true'][data-reserved='false']")
+    const day_item = document.querySelector("[data-selected='true'][data-closed='false']");
+    if(time_slot_item ==null || time_slot_item ==undefined) return;
+    if(day_item ==null || day_item ==undefined) return;
+    const time_slot = time_slot_item.dataset.time_slot;
+    const day = (parseInt(day_item.dataset.day)-(new Date().getDate()))%7;
+    const data = {stadium_id, time_slot, day};
     postToServer('reservation', data).then(
         status => {
             if(status==200){
-                item.setAttribute('data-reserved', true);
+                time_slot_item.setAttribute('data-reserved', true);
             }
         }
     )
@@ -218,4 +228,44 @@ function formatTime(arg){
         timeArr[0].length==1 ? time= "0"+timeArr[0]+":"+minutes :time = timeArr[0]+":"+minutes;
     }
     return time;
+}
+
+function showDates(data){
+    const dates = document.getElementById("dates");
+    while(dates.hasChildNodes()){
+        dates.removeChild(dates.firstChild)
+    }
+
+    const date = new Date();
+    let day = date.getDate();
+    let month = date.getMonth()+1;
+
+    let hasSetAvailableDay = false;
+
+    for(let i=0; i<7; i++){
+        const li = document.createElement("li")
+        li.setAttribute('data-day', `${day+i}`);
+        li.setAttribute('id', 'date-item');
+        const weekday = (getDayOfTheWeek()+i)%6;
+        const isAvailable = data.available_days.some(item => item==weekday);
+        li.setAttribute('data-selected', isAvailable && !hasSetAvailableDay ? 'true' : 'false');
+        if(isAvailable) hasSetAvailableDay = true;
+        const p =document.createElement("p");
+        const newDate = new Date(date.getTime()+(i*24*60*60*1000));
+        day = newDate.getDate();
+        month = newDate.getMonth()+1;
+        p.innerText = `${day}/${month}`;
+        li.appendChild(p);
+        li.setAttribute('data-closed', !isAvailable);
+        if(isAvailable){
+            applyItemListener(li, dates, ()=>{}, showAvailableReservations, data, weekday);
+        }
+        dates.appendChild(li);  
+    } 
+}
+
+function getDayOfTheWeek(){
+    const date = new Date();
+    const day = date.getDay();
+    return day;
 }

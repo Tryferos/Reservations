@@ -2,7 +2,7 @@ import express from 'express'
 import path from 'path';
 import session from 'express-session';
 import {UserSession, UserCredentials, UserQuery, UserQuerySingle,  MySQLInsert, UserType} from './types/user'
-import {ReservationBody, StadiumBody, StadiumQuery} from './types/stadium';
+import {ReservationBody, StadiumBody, StadiumQuery, Weekday} from './types/stadium';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import mysql from 'mysql2';
@@ -89,10 +89,11 @@ app.post('/reservation', (req: UserSession, res) => {
     });
 });
 
-app.get('/reservations/:stadium_id', (req: UserSession, res) => {
+app.get('/reservations/:stadium_id/:day', (req: UserSession, res) => {
     const stadium_id = req.params.stadium_id as unknown as number;
+    const day = req.params.day as unknown as Weekday;
     verifyUser(req, res, () => {
-        retrieveStadiumReservations(con, stadium_id, (err, result) => {
+        retrieveStadiumReservations(con, stadium_id, day,(err, result) => {
             if(err) throw err;
             res.json(result);
         });
@@ -105,7 +106,7 @@ app.get('/stadiums', (req: UserSession, res) => {
     verifyUser(req, res, () => {
         retrieveStadiums(con, (err, result: StadiumQuery) => {
             if(err) throw err;
-            res.json(result);
+            res.json(result.map(item => ({...item, available_days: (item.available_days as string).split(',')})));
         });
     });
 
@@ -125,6 +126,7 @@ app.post('/create-stadium', upload.single('image'),(req: UserSession, res, next)
 
     const body = req.body as StadiumBody;
     body.type = (body.type as unknown as string[]).join('x');
+    console.log(body);
     const file = req.file;
     verifyUser(req, res, () => {
         if(!body.name || !body.type || !body.location || !body.price_total || !body.available_to || !body.available_from || !body.game_length || !body.sport){
@@ -204,7 +206,7 @@ app.listen(port, () => {
         }
     )
     con.query(
-        'CREATE TABLE IF NOT EXISTS mydb.stadiums (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), type VARCHAR(255), sport VARCHAR(255), date BIGINT(255), image VARCHAR(255), description VARCHAR(255), location VARCHAR(255), owner_id INT FOREIGN KEY references mydb.users(id)'+
+        'CREATE TABLE IF NOT EXISTS mydb.stadiums (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), type VARCHAR(255), sport VARCHAR(255), date BIGINT(255), image VARCHAR(255), available_days set("0", "1", "2", "3", "4", "5", "6"),description VARCHAR(255), location VARCHAR(255), owner_id INT FOREIGN KEY references mydb.users(id)'+
             ', price_total FLOAT(255,2), available_from TINYINT(255), available_to TINYINT(255))', (res, err) => {
         }
     )
@@ -213,5 +215,4 @@ app.listen(port, () => {
             'stadium_id int, user_id int, time_slot int, date bigint(255), FOREIGN KEY (stadium_id) references mydb.stadiums(id), FOREIGN KEY (user_id) references mydb.users(id))', (res, err) => {
         }
     )
-    return console.log('Express is listening in '+port);
 })

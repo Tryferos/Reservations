@@ -142,4 +142,23 @@ li[data-selected]{
     color: var(--var-secondary)
 }
 
+#dates{
+    display: flex;
+    list-style: none;
+    gap: 0px 12px;
+    justify-content: space-evenly;
+}
+
+#date-item[data-closed='true']{
+    cursor:not-allowed;
+    color: var(--var-primary-light);
+}
+
+#date-item[data-selected='false'][data-closed='false']:hover,
+#date-item[data-selected='true']{
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 2px;
+}
+
 

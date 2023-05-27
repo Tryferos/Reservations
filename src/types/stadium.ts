@@ -1,5 +1,7 @@
 import { MySQLType } from "./user";
 
+export type Weekday = 0 | 1 | 2 | 3 | 5 | 6;
+
 export type StadiumQuerySQL = {
     id: number;
     name: string;
@@ -10,6 +12,7 @@ export type StadiumQuerySQL = {
     price_total: number;
     available_from: number;
     available_to: number;
+    available_days: Weekday[] | string;
     location: string;
     description: string;
     owner_id: number;
@@ -22,12 +25,11 @@ export type StadiumQuery = MySQLType & Array<Stadium>;
 export type StadiumQuerySingle = MySQLType & Stadium;
 
 export type ReservationQuerySql = {
-    id: number;
     stadium_id: number;
     user_id: number;
-    date: number;
     time_slot: number;
-}
+    day: Weekday;
+} & Pick<StadiumQuerySQL, 'id' | 'date'>;
 
 export type ReservationBody = Omit<ReservationQuerySql, 'id' | 'user_id' | 'date'>;
 export type Reservation = Omit<ReservationQuerySql, 'user_id'>;

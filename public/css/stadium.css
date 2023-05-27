@@ -103,3 +103,28 @@ option{
     outline: none;
     display: none;
 }
+
+#weekdays{
+    list-style: none;
+    display: flex;
+    justify-content: space-evenly;
+    gap: 0px 12px;
+    padding: 6px 4px;
+}
+
+#weekdays > li{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#weekdays > li > p{
+    font-size: 1em;
+}   
+
+#weekdays > li > input{
+    cursor: pointer;
+    transform: scale(1.25);
+    accent-color: var(--var-secondary);
+}
