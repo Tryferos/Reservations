@@ -166,8 +166,7 @@ async function showStadium(data){
     const title = document.getElementById("stadium-title");
     title.innerText = data.name+", "+data.location;
 
-    showDates(data);
-    await showAvailableReservations(data, getDayOfTheWeek());
+    await showAvailableReservations(data, showDates(data));
 }
 
 async function showAvailableReservations(...data){
@@ -242,6 +241,7 @@ function showDates(data){
     let currentMonth = date.getMonth()+1;
 
     let hasSetAvailableDay = false;
+    let availableDay = 0;
 
     for(let i=0; i<7; i++){
         const li = document.createElement("li")
@@ -250,7 +250,10 @@ function showDates(data){
         const weekday = (getDayOfTheWeek()+i)%7;
         const isAvailable = data.available_days.some(item => item==weekday);
         li.setAttribute('data-selected', isAvailable && !hasSetAvailableDay ? 'true' : 'false');
-        if(isAvailable) hasSetAvailableDay = true;
+        if(isAvailable && !hasSetAvailableDay) {
+            hasSetAvailableDay = true;
+            availableDay = weekday;
+        }
         const p =document.createElement("p");
         const newDate = new Date(date.getTime()+(i*24*60*60*1000));
         const day = newDate.getDate();
@@ -263,6 +266,7 @@ function showDates(data){
         }
         dates.appendChild(li);  
     } 
+    return availableDay;
 }
 
 function getDayOfTheWeek(){
