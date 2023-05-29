@@ -1,6 +1,12 @@
+body > h2{
+    margin-top: 150px;
+    text-align: center;
+    font-size: 1.75rem;
+    font-family: Wotfard;
+}
 #reservations-list{
     width: 100%;
-    margin-top: 200px;
+    margin-top: 75px;
     padding-bottom: 100px;
     display: flex;
     flex-wrap: wrap;
@@ -12,17 +18,29 @@
 }
 
 .reservation-item{
-    width: calc(100% / 3 - 24px);
-    min-width: 360px;
+    width: calc(100% / 3 - 48px);
+    min-width: calc(400px - 4vw);
     height: calc(150px + 2vw);
-    outline: 1px solid #ccc;
     border-radius: 5px;
     box-shadow: 1px 1px 8px 4px #ccc;
     padding: 24px 24px;
 }
+
+.reservation-item[data-past="false"][data-soon="true"]{
+    outline: 1px solid #f5c542;
+}
+.reservation-item[data-past="false"][data-soon="false"]{
+    outline: 1px solid #4caf50;
+}
+.reservation-item[data-past="true"]{
+    outline: 1px solid #f44336;
+}
+
 .reservation-item:hover{
     outline: 1px solid #999595;
     cursor: pointer;
+    transform: scale(1.01);
+    transition: cubic-bezier(0.785, 0.135, 0.15, 0.86) 0.15s transform;
 }
 
 .reservation-item > figure{
@@ -46,4 +64,5 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    gap: 2px 0px;
 }
