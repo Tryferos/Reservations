@@ -8,7 +8,7 @@ import cors from 'cors';
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import multer from 'multer';
-import {insertStadium, insertStadiumReservation, insertUser, retrieveStadiumReservations, retrieveStadiums, retrieveUser, retrieveUserFieldById, verifyUser} from './db/queries'
+import {insertStadium, insertStadiumReservation, insertUser, retrieveStadium, retrieveStadiumReservations, retrieveStadiums, retrieveUser, retrieveUserFieldById, retrieveUserReservations, verifyUser} from './db/queries'
 
 dotenv.config({path: path.join(__dirname, '../.env.local')});
 
@@ -34,9 +34,22 @@ app.use(express.urlencoded({limit: '50mb', extended: true}));
 
 const imagesDirectory = 'stadiums/'
 const index = path.join(__dirname, '../public/html/index.html')
+const reservations = path.join(__dirname, '../public/html/reservations.html')
 const merchant = path.join(__dirname, '../public/html/merchant.html')
 const stadiumCreation = path.join(__dirname, '../public/html/stadium-creation.html')
 const user = path.join(__dirname, '../public/html/user.html')
+
+function authMiddleware(req: UserSession, res, next){
+    const query = req.path;
+    const allowedPaths = ['/login', '/', '/merchant']
+    if(req.session.userid || allowedPaths.includes(query)){
+        next();
+    }else{
+        res.redirect('/?error=not_logged_in');
+    }
+}
+
+app.use(authMiddleware);
 
 app.post('/login', (req: UserSession, res) => {
     const {username, password, normal, merchant} = req.body as UserCredentials;
@@ -69,45 +82,52 @@ app.post('/login', (req: UserSession, res) => {
 
 app.get('/user-type', (req: UserSession, res) => {
     const sezzion = req.session;
-    if(sezzion.userid){
-        retrieveUserFieldById(con, sezzion.userid, "type",(err, result: UserQuery) => {
-            if(err) throw err;
-            res.json(result[0].type);
-        });
-    }else{
-        res.json(null);
-    }
+    retrieveUserFieldById(con, sezzion.userid, "type",(err, result: UserQuery) => {
+        if(err) throw err;
+        res.json(result[0].type);
+    });
 });
 
 app.post('/reservation', (req: UserSession, res) => {
     const body = req.body as ReservationBody;
-    verifyUser(req, res, () => {
-        insertStadiumReservation(con, body, req.session.userid,(err, result: MySQLInsert) => {
-            if(err) throw err;
-            res.status(200).json(result.insertId);
-        });
+    insertStadiumReservation(con, body, req.session.userid,(err, result: MySQLInsert) => {
+        if(err) throw err;
+        res.status(200).json(result.insertId);
+    });
+});
+
+app.get('/reservations', (req: UserSession, res) => {
+    res.sendFile(reservations)
+});
+app.get('/get-reservations', (req: UserSession, res) => {
+    retrieveUserReservations(con, req.session.userid,(err, result) => {
+        if(err) throw err;
+        res.json(result);
+    });
+});
+app.get('/get-stadium/:stadium_id', (req: UserSession, res) => {
+    const stadium_id = req.params.stadium_id as unknown as number;
+    retrieveStadium(con, stadium_id,(err, result) => {
+        if(err) throw err;
+        res.json(result[0]);
     });
 });
 
 app.get('/reservations/:stadium_id/:day', (req: UserSession, res) => {
     const stadium_id = req.params.stadium_id as unknown as number;
     const day = req.params.day as unknown as Weekday;
-    verifyUser(req, res, () => {
-        retrieveStadiumReservations(con, stadium_id, day,(err, result) => {
-            if(err) throw err;
-            res.json(result);
-        });
+    retrieveStadiumReservations(con, stadium_id, day,(err, result) => {
+        if(err) throw err;
+        res.json(result);
     });
 });
 
 
 app.get('/stadiums', (req: UserSession, res) => {
 
-    verifyUser(req, res, () => {
-        retrieveStadiums(con, (err, result: StadiumQuery) => {
-            if(err) throw err;
-            res.json(result.map(item => ({...item, available_days: (item.available_days as string).split(',')})));
-        });
+    retrieveStadiums(con, (err, result: StadiumQuery) => {
+        if(err) throw err;
+        res.json(result.map(item => ({...item, available_days: (item.available_days as string).split(',')})));
     });
 
 });
@@ -128,37 +148,33 @@ app.post('/create-stadium', upload.single('image'),(req: UserSession, res, next)
     body.type = (body.type as unknown as string[]).join('x');
     console.log(body);
     const file = req.file;
-    verifyUser(req, res, () => {
-        if(!body.name || !body.type || !body.location || !body.price_total || !body.available_to || !body.available_from || !body.game_length || !body.sport){
-            res.redirect('/stadium-creation?error=missing_fields');
-            return;
-        }
-        if(file!=undefined){
-            body.image = imagesDirectory+ file.fieldname + '-' + file.originalname;
-        }
-        insertStadium(con, req.session.userid as unknown as number, body, (err, result) => {
-            if(err) throw err;
-            res.writeHead(302, {
-                'Location': '/'
-            });
-            res.end();
+    if(!body.name || !body.type || !body.location || !body.price_total || !body.available_to || !body.available_from || !body.game_length || !body.sport){
+        res.redirect('/stadium-creation?error=missing_fields');
+        return;
+    }
+    if(file!=undefined){
+        body.image = imagesDirectory+ file.fieldname + '-' + file.originalname;
+    }
+    insertStadium(con, req.session.userid as unknown as number, body, (err, result) => {
+        if(err) throw err;
+        res.writeHead(302, {
+            'Location': '/'
         });
+        res.end();
     });
 
 });
 app.post('/stadium-creation', (req: UserSession, res) => {
 
-    verifyUser(req, res, () => {
-        res.sendFile(stadiumCreation);
-    });
+    res.sendFile(stadiumCreation);
 
 });
 
 app.get('/username', (req: UserSession, res) => {
-    verifyUser(req, res, () => retrieveUserFieldById(con, req.session.userid, "username",(err, result: UserQuery) => {
+    retrieveUserFieldById(con, req.session.userid, "username",(err, result: UserQuery) => {
         if(err || result.length==0) throw err;
         res.json(result[0].username);
-    }));
+    });
 })
 
 

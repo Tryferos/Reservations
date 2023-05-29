@@ -55,6 +55,21 @@ export function retrieveStadiums(
     ) {
         db.query('select s.name, s.type, s.sport, s.date, s.price_total, s.available_from, s.available_to, s.location, s.game_length, s.image, s.description, s.id, s.available_days from mydb.stadiums s', callback);
 }
+export function retrieveStadium(
+    db: mysql.Connection,
+    stadium_id: number | string,
+    callback: (err: mysql.QueryError | null, res: StadiumQuery) => void
+    ) {
+        db.query(`select s.name, s.type, s.sport, s.date, s.price_total, s.available_from, s.available_to, s.location, s.game_length, s.image, s.description, s.id, s.available_days from mydb.stadiums s where s.id=${stadium_id}`, callback);
+}
+
+export function retrieveUserReservations(
+    db: mysql.Connection,
+    user_id: number | string,
+    callback: (err: mysql.QueryError | null, res: MySQLType) => void
+){
+    db.query(`select * from mydb.reservations where user_id = ${user_id} order by date_day`, [user_id], callback);
+}
 
 export function retrieveStadiumReservations(
     db: mysql.Connection,
