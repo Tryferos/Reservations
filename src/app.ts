@@ -2,13 +2,13 @@ import express from 'express'
 import path from 'path';
 import session from 'express-session';
 import {UserSession, UserCredentials, UserQuery, UserQuerySingle,  MySQLInsert, UserType} from './types/user'
-import {ReservationBody, StadiumBody, StadiumQuery, Weekday} from './types/stadium';
+import {Reservation, ReservationBody, StadiumBody, StadiumQuery, Weekday} from './types/stadium';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import multer from 'multer';
-import {insertStadium, insertStadiumReservation, insertUser, retrieveStadium, retrieveStadiumReservations, retrieveStadiums, retrieveUser, retrieveUserFieldById, retrieveUserReservations, verifyUser} from './db/queries'
+import {deleteReservation, insertStadium, insertStadiumReservation, insertUser, retrieveStadium, retrieveStadiumReservations, retrieveStadiums, retrieveUser, retrieveUserFieldById, retrieveUserReservations, verifyUser} from './db/queries'
 
 dotenv.config({path: path.join(__dirname, '../.env.local')});
 
@@ -80,6 +80,8 @@ app.post('/login', (req: UserSession, res) => {
     });
 });
 
+app.get('/')
+
 app.get('/user-type', (req: UserSession, res) => {
     const sezzion = req.session;
     retrieveUserFieldById(con, sezzion.userid, "type",(err, result: UserQuery) => {
@@ -99,6 +101,7 @@ app.post('/reservation', (req: UserSession, res) => {
 app.get('/reservations', (req: UserSession, res) => {
     res.sendFile(reservations)
 });
+
 app.get('/get-reservations', (req: UserSession, res) => {
     retrieveUserReservations(con, req.session.userid,(err, result) => {
         if(err) throw err;
@@ -122,6 +125,17 @@ app.get('/reservations/:stadium_id/:day', (req: UserSession, res) => {
     });
 });
 
+app.post('/reservations/delete', (req: UserSession, res) => {
+    const body = req.body as Reservation;
+    const user_id = req.session.userid as unknown as number;
+    deleteReservation(con, body, user_id,(err, result) => {
+        if(err) throw err;
+        if(result.affectedRows!=1){
+            res.json({success: false})
+        }
+        res.json({success: true, id: body.id});
+    });
+});
 
 app.get('/stadiums', (req: UserSession, res) => {
 

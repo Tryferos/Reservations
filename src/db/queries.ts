@@ -1,7 +1,7 @@
 import mysql from 'mysql2';
 import {UserSession, UserCredentials, UserQuery, UserQuerySingle, MySQLType, MySQLInsert, UserType} from '../types/user'
 import { UserCredentialsQuery } from '../types/user';
-import { ReservationBody, StadiumBody, StadiumQuery, Weekday } from '../types/stadium'
+import { Reservation, ReservationBody, StadiumBody, StadiumQuery, Weekday } from '../types/stadium'
 
 export function retrieveUser(
     db: mysql.Connection,
@@ -103,6 +103,14 @@ export function insertStadiumReservation(
         )`, callback);
 }
 
+export function deleteReservation(
+    db: mysql.Connection,
+    body: Reservation,
+    user_id: number | string,
+    callback: (err: mysql.QueryError | null, res: MySQLInsert) => void
+    ) {
+        db.query(`delete from mydb.reservations where id = ${body.id} and time_slot=${body.time_slot} and day='${body.day}' and user_id = ${user_id}`, callback);
+}
 
 
 

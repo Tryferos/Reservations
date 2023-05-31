@@ -12,8 +12,23 @@ async function fetchFromServer(path){
     });
 }
 
+async function postToServer(path, data){
+    return new Promise((res, rej) => {
+        const xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function(){
+            if(this.readyState==4 && this.status==200){
+                res(JSON.parse(this.responseText))
+            }
+        }
+        xhttp.open("POST", `http://${location.hostname+":"+location.port}/${path}`, true);
+        xhttp.setRequestHeader('Content-Type', 'application/json');
+        xhttp.send(JSON.stringify(data));
+    });
+}
+
 async function fetchReservations(){
     const data = await fetchFromServer("get-reservations");
+    document.getElementById("reservations-count").innerText = data.length;
     if(data.length==0) return;
     data.forEach(async(reservation) => {
         const stadium = await fetchFromServer(`get-stadium/${reservation.stadium_id}`);
@@ -53,10 +68,35 @@ async function addReservation(stadium, reservation){
     p.innerHTML = `<span>Reservation date:</span> <time>${formatDate(date, stadium.game_length)}</time>`;
     const p2 = document.createElement("p");
     p2.innerText = `${stadium.sport} - ${stadium.type} - ${formatPrice(stadium.price_total)}€`;
+    const svgDelete = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svgDelete.setAttribute('class', 'reservation-btns-delete');
+    svgDelete.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z"/></svg>`;
+    svgDelete.addEventListener('click', async(ev) => {
+        await handleDeleteReservation(ev, reservation);
+    });
+    const svgEdit = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svgEdit.setAttribute('class', 'reservation-btns-edit');
+    svgEdit.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z"/></svg>`;
+    svgEdit.addEventListener('click', async(ev) => {
+        // await handleDeleteReservation(ev, reservation);
+    });
+    li.appendChild(svgDelete);
+    li.appendChild(svgEdit);
+    li.setAttribute('data-id', reservation.id);
     div.appendChild(p2);
     div.appendChild(p);
     li.appendChild(div);
     list.appendChild(li);
+}
+
+async function handleDeleteReservation(ev, reservation){
+    const res = await postToServer(`reservations/delete`, reservation);
+    if(!res.success) return;
+    const li = document.querySelectorAll(`[data-id="${reservation.id}"]`)[0];
+    const list = document.getElementById("reservations-list");
+    list.removeChild(li);
+    const count = document.getElementById("reservations-count");
+    count.innerText = parseInt(count.innerText)-1;
 }
 
 function formatPrice(price){

@@ -29,9 +29,10 @@ export type ReservationQuerySql = {
     user_id: number;
     time_slot: number;
     day: Weekday;
+    date_day: number;
 } & Pick<StadiumQuerySQL, 'id' | 'date'>;
 
-export type ReservationBody = Omit<ReservationQuerySql, 'id' | 'user_id' | 'date'>;
+export type ReservationBody = Omit<ReservationQuerySql, 'id' | 'user_id' | 'date' | 'date_day'>;
 export type Reservation = Omit<ReservationQuerySql, 'user_id'>;
 export type ReservationQuery = MySQLType & Array<Reservation>;
 export type ReservationQuerySingle = MySQLType & Reservation;

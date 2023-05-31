@@ -24,6 +24,7 @@ body > h2{
     border-radius: 5px;
     box-shadow: 1px 1px 8px 4px #ccc;
     padding: 24px 24px;
+    position: relative;
 }
 
 .reservation-item[data-past="false"][data-soon="true"]{
@@ -36,8 +37,40 @@ body > h2{
     outline: 1px solid #f44336;
 }
 
+.reservation-btns-delete,
+.reservation-btns-edit{
+    display: none;
+}
+
+
+.reservation-item:hover
+.reservation-btns-delete{
+    position: absolute;
+    display: flex;
+    right: 12px;
+    top: 12px;
+    width: 24px;
+    height: 24px;
+}
+
+.reservation-btns-delete:hover{
+    fill: #f44336;
+}
+.reservation-btns-edit:hover{
+    fill: #4caf50;
+}
+
+.reservation-item:hover
+.reservation-btns-edit{
+    position: absolute;
+    display: flex;
+    right: 42px;
+    top: 12px;
+    width: 24px;
+    height: 24px;
+}
+
 .reservation-item:hover{
-    outline: 1px solid #999595;
     cursor: pointer;
     transform: scale(1.01);
     transition: cubic-bezier(0.785, 0.135, 0.15, 0.86) 0.15s transform;
