@@ -15,6 +15,14 @@
     z-index: 1000;
 }
 
+#username{
+    text-decoration: none;
+}
+
+#username:hover{
+    transform: scale(1.25);
+}
+
 #reservations-count{
     font-size: 1.5rem;
 }

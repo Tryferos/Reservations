@@ -160,7 +160,6 @@ app.post('/create-stadium', upload.single('image'),(req: UserSession, res, next)
 
     const body = req.body as StadiumBody;
     body.type = (body.type as unknown as string[]).join('x');
-    console.log(body);
     const file = req.file;
     if(!body.name || !body.type || !body.location || !body.price_total || !body.available_to || !body.available_from || !body.game_length || !body.sport){
         res.redirect('/stadium-creation?error=missing_fields');
