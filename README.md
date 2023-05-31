@@ -41,16 +41,10 @@ Go to the project directory
 
 Make sure you have nodejs installed.
 
-Install dependencies
+Install all dependencies
 
 ```bash
-  npm i ts-node
-  npm i express
-  npm i express-session
-  npm i cookie-parser
-  npm i mysql2
-  npm i dotenv
-  npm i cors
+  npm i
 ```
 
 Start the server
